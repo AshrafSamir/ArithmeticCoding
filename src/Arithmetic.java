@@ -1,41 +1,55 @@
+import java.io.*;
 import java.security.PrivilegedAction;
 import java.util.*;
 
-public class Arithmetic {
 
-    public static void main(String[] args) {
+//BufferedWriter writer = new BufferedWriter(new FileWriter("answer.txt",true));
+//BufferedReader br = new BufferedReader(new FileReader(file));
+
+public class Arithmetic {
+    BufferedWriter writer = new BufferedWriter(new FileWriter("answer.txt"));
+
+    public Arithmetic() throws IOException {
+    }
+
+    public static void main(String[] args) throws IOException {
 
         Arithmetic call = new Arithmetic();
-        Scanner input = new Scanner(System.in);
+
+        File file = new File("seqInput.txt");
+        Scanner input = new Scanner(file);
         input.useLocale( Locale.US );
         String seq;
         double result1;
         String result2;
-
         ArrayList<Char> probTable;
+
         probTable = call.takeProbabilityInput();
         call.print(probTable);
-        System.out.println("Enter sequence pls : ");
         seq = input.next();
         result1 = call.compress(seq,probTable);
-        System.out.println(result1);
+        call.writer.write(result1+" ");
+        call.writer.newLine();
         result2 = call.decompress(probTable,result1);
-        System.out.println(result2);
+
+        call.writer.write(result2+" ");
+        call.writer.newLine();
+        call.writer.close();
+        input.close();
     }
 
-    private ArrayList<Char> takeProbabilityInput(){
-        Scanner input = new Scanner(System.in);
+    private ArrayList<Char> takeProbabilityInput() throws FileNotFoundException {
+        File file = new File("probInput.txt");
+        Scanner input = new Scanner(file);
         input.useLocale( Locale.US );
         ArrayList<Char> chars = new ArrayList<>();
         double d;
         String ch = "";
         boolean flag = true;
+        int count = 0;
 
-        System.out.println("Enter number of probabilities : ");
-        int n = input.nextInt();
-        System.out.println("Enter probabilities :");
 
-        for(int i=0;i<n;i++){
+        while(input.hasNext()){
             Char c = new Char();
             ch = input.next();
             d = input.nextDouble();
@@ -52,14 +66,16 @@ public class Arithmetic {
             }
             else {
                 c.setCha(ch);
-                c.setLow(chars.get(i-1).getHigh());
-                c.setHigh(chars.get(i-1).getHigh()+d);
+                c.setLow(chars.get(count-1).getHigh());
+                c.setHigh(chars.get(count-1).getHigh()+d);
                 c.setRange(c.getHigh()-c.getLow());
             }
+            count++;
         }
+        input.close();
         return chars;
     }
-    private double compress(String seq,ArrayList<Char> probTable){
+    private double compress(String seq,ArrayList<Char> probTable) throws IOException {
         double low = 0,high = 1,range = 1,result,alias = 0;
         String tmp;
         Char tm;
@@ -72,7 +88,8 @@ public class Arithmetic {
             low = alias;
             range = high-low;
         }
-        System.out.println(low+"    "+high);
+        writer.write(low+"    "+high);
+        writer.newLine();
         return getRandom(low,high);
     }
     private String decompress(ArrayList<Char> probTable,double code){
@@ -82,6 +99,7 @@ public class Arithmetic {
             if((code<probTable.get(i).getHigh())&&(code>probTable.get(i).getLow())){
                 output+=probTable.get(i).getCha();
                 code = (code-probTable.get(i).getLow())/(probTable.get(i).getRange());
+                break;
             }
         }
         }
@@ -93,11 +111,14 @@ public class Arithmetic {
         }
         return null;
     }
-    private void print(ArrayList<Char> p){
-        for (int i=0;i<p.size();i++){
-            System.out.println(p.get(i).toString());
-        }
+    private void print(ArrayList<Char> p) throws IOException {
 
+        for (int i=0;i<p.size();i++){
+            writer.write(p.get(i).toString());
+            writer.newLine();
+        }
+        writer.write("______________");
+        writer.newLine();
 
     }
     public static double getRandom(double min, double max){
