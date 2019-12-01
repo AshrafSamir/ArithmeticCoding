@@ -8,6 +8,8 @@ import java.util.*;
 
 public class Arithmetic {
     BufferedWriter writer = new BufferedWriter(new FileWriter("answer.txt"));
+    double lower;
+    double higher;
 
     public Arithmetic() throws IOException {
     }
@@ -21,7 +23,7 @@ public class Arithmetic {
         input.useLocale( Locale.US );
         String seq;
         double result1;
-        String result2;
+        String result2,result3;
         ArrayList<Char> probTable;
 
         probTable = call.takeProbabilityInput();
@@ -31,10 +33,13 @@ public class Arithmetic {
         call.writer.write(result1+" ");
         call.writer.newLine();
         result2 = call.decompress(probTable,result1);
-
+        result3 = call.generateCode(call.lower,call.higher);
+        call.writer.write(result3);
+        call.writer.newLine();
         call.writer.write(result2+" ");
         call.writer.newLine();
         call.writer.close();
+
         input.close();
     }
 
@@ -90,6 +95,9 @@ public class Arithmetic {
         }
         writer.write(low+"    "+high);
         writer.newLine();
+
+        lower = low;
+        higher = high;
         return getRandom(low,high);
     }
     private String decompress(ArrayList<Char> probTable,double code){
@@ -123,6 +131,39 @@ public class Arithmetic {
     }
     public static double getRandom(double min, double max){
         return (Math.random()*((max-min))) +min;
+    }
+    public String generateCode(double low, double high) throws IOException {
+        String code = "1";
+        double result = 0;
+        for(int i=0;i<code.length();i++){
+            for(int j=0;j<code.length();j++) {
+                if(j==0) result = 0;
+                if (String.valueOf(code.charAt(j)).equals("1")) {
+                    result += getPow(0.5, j + 1);
+                }
+            }
+            if(result<low){
+                code+="1";
+            }
+            else if((result>low)&&(result>high)){
+                code=code.substring(0,code.length()-1)+"01";
+                i--;
+            }
+            else break;
+
+        }
+        writer.write(result+" ");
+        writer.newLine();
+        code ="0."+code;
+        return code;
+    }
+    public double getPow(double base,int pow){
+        double result = 1;
+        for (int i=0;i<pow;i++){
+            result *= base;
+        }
+        return result;
+
     }
 
 
