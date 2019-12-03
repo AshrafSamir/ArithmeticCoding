@@ -1,5 +1,5 @@
 import java.io.*;
-import java.security.PrivilegedAction;
+import javax.swing.*;
 import java.util.*;
 
 
@@ -11,19 +11,22 @@ public class Arithmetic {
     double lower;
     double higher;
 
+
     public Arithmetic() throws IOException {
+
     }
 
     public static void main(String[] args) throws IOException {
 
         Arithmetic call = new Arithmetic();
-
-        File file = new File("seqInput.txt");
+        String path = JOptionPane.showInputDialog("Enter File Path of The Sequence :");
+        File file = new File(path);
         Scanner input = new Scanner(file);
         input.useLocale( Locale.US );
         String seq;
         double result1;
-        String result2,result3;
+        String result2;
+        double result3;
         ArrayList<Char> probTable;
 
         probTable = call.takeProbabilityInput();
@@ -32,19 +35,22 @@ public class Arithmetic {
         result1 = call.compress(seq,probTable);
         call.writer.write(result1+" ");
         call.writer.newLine();
-        result2 = call.decompress(probTable,result1);
         result3 = call.generateCode(call.lower,call.higher);
-        call.writer.write(result3);
-        call.writer.newLine();
+        result2 = call.decompress(probTable,result3);
+
+
         call.writer.write(result2+" ");
         call.writer.newLine();
         call.writer.close();
 
         input.close();
+        JOptionPane.showMessageDialog(null,"Done!","Output",JOptionPane.PLAIN_MESSAGE);
+
     }
 
     private ArrayList<Char> takeProbabilityInput() throws FileNotFoundException {
-        File file = new File("probInput.txt");
+        String path = JOptionPane.showInputDialog("Enter File Path of The probability table :");
+        File file = new File(path);
         Scanner input = new Scanner(file);
         input.useLocale( Locale.US );
         ArrayList<Char> chars = new ArrayList<>();
@@ -132,7 +138,7 @@ public class Arithmetic {
     public static double getRandom(double min, double max){
         return (Math.random()*((max-min))) +min;
     }
-    public String generateCode(double low, double high) throws IOException {
+    public double generateCode(double low, double high) throws IOException {
         String code = "1";
         double result = 0;
         for(int i=0;i<code.length();i++){
@@ -152,10 +158,13 @@ public class Arithmetic {
             else break;
 
         }
+
+        code ="0."+code;
+        writer.write(code);
+        writer.newLine();
         writer.write(result+" ");
         writer.newLine();
-        code ="0."+code;
-        return code;
+        return result;
     }
     public double getPow(double base,int pow){
         double result = 1;
